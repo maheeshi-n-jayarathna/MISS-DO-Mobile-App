@@ -186,37 +186,40 @@ const EditTask: React.FC = ({ navigation, route }: any) => {
       const tasks = await getData("tasks");
       if (tasks) {
         const taskList = JSON.parse(tasks);
-        const task = taskList.find((task: any, index: number) => index === taskId); // Get the correct task
+        const task = taskList[taskId]; // Task eka index ekata milanu karala load karanawa
         if (task) {
-          setTaskName(task.name);
-          setDescription(task.description);
-          setDueDate(task.dueDate);
+          setTaskName(task.name); // Name field ekata update karanawa
+          setDescription(task.description); // Description ekata data set karanawa
+          setDueDate(task.dueDate); // Due date set karanawa
+        } else {
+          Alert.alert("Error", "Task not found.");
         }
       }
     } catch (error) {
-      console.error("Error loading task:", error);
+      console.error("Error loading task:", error); // Error handling ekak dagena
     }
   };
+  
 
   const handleEdit = async () => {
     if (taskName && description && dueDate) {
       try {
-        const tasks: any = await getData("tasks");
-        const taskList = JSON.parse(tasks);
-        taskList[taskId] = { name: taskName, description, dueDate }; // Update the task
-        await saveData("tasks", JSON.stringify(taskList)); // Save the updated list
-        navigation.navigate("Tasks"); // Navigate back to Tasks screen
+        const tasks = await getData("tasks"); // Save karanna ona task tika data ganna
+        if (tasks) {
+          const taskList = JSON.parse(tasks); // Task list ekata parse karanawa
+          taskList[taskId] = { name: taskName, description, dueDate }; // Task eka update karanawa taskId eka match wenakota
+          await saveData("tasks", JSON.stringify(taskList)); // Updated task tika save karanawa
+          navigation.navigate("Tasks"); // Tasks screen ekata apahu yannawa
+        } else {
+          Alert.alert("Error", "No tasks found.");
+        }
       } catch (error) {
         console.error("Error saving task:", error);
       }
     } else {
-      Alert.alert("Error", "Please fill in all fields.");
+      Alert.alert("Error", "Please fill in all fields."); // Field tikak empty unoth alert ekak pennanawa
     }
-  };
-
-  useEffect(() => {
-    loadTask(); // Load task data on component mount
-  }, []);
+  };  
 
   return (
     <View style={styles.container}>
